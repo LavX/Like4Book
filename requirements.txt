@@ -1,5 +1,4 @@
-requests
-rich
-selenium
-undetected-chromedriver
-webdriver_manager
+requests>=2.31.0
+rich>=13.7.0
+selenium>=4.16.0
+undetected-chromedriver>=3.5.4

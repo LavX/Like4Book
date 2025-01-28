@@ -1,12 +1,39 @@
-# Ignore sensitive files
-Penyimpanan/Cookie.json
-Penyimpanan/Subscribe.json
-
-# IDE files
-.vscode/
-.idea/
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.env/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Project specific
+src/data/cookies.json
+*.log
+.DS_Store
