@@ -31,12 +31,19 @@
             }
         }
     },
+    "messages": {
+        "no_missions": "No available missions at the moment",
+        "bot_detected": "Bot detected, please wait",
+        "connection_error": "Connection error, retrying",
+        "deleting_data": "Deleting your account data, please wait..."
+    },
     "menu": {
         "title": "Available Options",
         "exchange_profile": "Exchange Coins for Followers (Profile)",
         "follow_mission": "Run Facebook Follow Mission",
         "delete_links": "Delete Connected Links",
         "exchange_page": "Exchange Coins for Followers (Page)",
+        "twitter_likes": "Run Twitter Like Mission",
         "exit": "Exit",
         "switch_language": "Switch Language / Ganti Bahasa",
         "select_option": "Select option:"

@@ -135,34 +135,20 @@ class Pengaturan:
             
             self.credits = self.Like4Like(cookies_like4like, Login=True)
             
-            # Step 2: Facebook Login
-            print(Panel(f"[bold white]{i18n.get_text('login.browser_login.steps.facebook')}", width=55, style="bold bright_white"))
-            driver_fb = self.launch_browser()
-            cookies_facebook = self.get_facebook_cookies(driver_fb)
-            driver_fb.quit()
-            
-            if not cookies_facebook:
-                raise Exception("Facebook login failed")
-            
-            self.name, self.user = self.Facebook(cookies_facebook)
-            
-            # Save cookies
+            # Save initial cookies
             with open("Penyimpanan/Cookie.json", "w+") as w:
                 w.write(
                     json.dumps(
                         {
-                            "Facebook": cookies_facebook,
                             "Like4Like": cookies_like4like
                         }, indent=4, sort_keys=True
                     )
                 )
             
             print(
-                Panel(f"""[bold white]{i18n.get_text('status.name')} :[bold green] {self.name}[bold white] >[bold green] {self.credits}
-[bold white]Link :[bold red] https://web.facebook.com/{self.user}""", width=55, style="bold bright_white", title="[bold bright_white]>> [Welcome] <<")
+                Panel(f"""[bold white]{i18n.get_text('status.coins')} :[bold green] {self.credits}""",
+                width=55, style="bold bright_white", title="[bold bright_white]>> [Welcome] <<")
             )
-            
-            Start().Following(cookies_facebook, "100006609458697", target=True)
             time.sleep(2.5)
             # Initialize main menu after successful login
             Fitur()
@@ -259,6 +245,118 @@ class Mission:
 
     def __init__(self) -> None:
         pass
+
+class Twitter:
+
+    def __init__(self) -> None:
+        pass
+
+    def Like(self, cookies_like4like: str) -> str:
+        """Handle Like4Like Twitter likes"""
+        session.headers.update({
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "Sec-Fetch-Mode": "navigate",
+            "Upgrade-Insecure-Requests": "1",
+            "Host": "www.like4like.org",
+            "Sec-Fetch-Dest": "document",
+            "User-Agent": "Mozilla/5.0 (Linux; Android 13; Pixel 6 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36",
+            "Accept-Language": "id",
+            "Sec-Fetch-Site": "same-origin",
+            "Sec-Fetch-User": "?1"
+        })
+
+        response0 = session.get(
+            "https://www.like4like.org/user/earn-twitter-favorites.php",
+            cookies={"Cookie": cookies_like4like}
+        )
+
+        session.headers.update({
+            "Referer": "https://www.like4like.org/user/earn-twitter-favorites.php",
+            "X-Requested-With": "XMLHttpRequest",
+            "Accept": "application/json, text/javascript, */*; q=0.01",
+            "Sec-Fetch-Dest": "empty",
+            "Sec-Fetch-Mode": "cors",
+            "User-Agent": "Mozilla/5.0 (Linux; Android 13; Pixel 6 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36",
+            "Sec-Fetch-Site": "same-origin"
+        })
+
+        response = session.get(
+            "https://www.like4like.org/api/get-tasks.php?feature=twitterfav",
+            cookies={"Cookie": cookies_like4like}
+        )
+
+        if '"success":true,' in str(response.text) and "twitter.com" in str(response.text):
+            for z in json.loads(response.text)["data"]["tasks"]:
+                timestamp_milliseconds = str(datetime.datetime.now().timestamp() * 1000).split(".")[0]
+                idlink, taskId, code3 = (z["idlink"], z["taskId"], z["code3"])
+                
+                session.headers.update({
+                    "Content-Type": "application/json; charset=utf-8"
+                })
+                
+                response2 = session.get(
+                    f"https://www.like4like.org/api/start-task.php?idzad={idlink}&vrsta=favorites&idcod={taskId}&feature=twitterfav&_={timestamp_milliseconds}",
+                    cookies={"Cookie": cookies_like4like}
+                )
+
+                if '"success":true,' in str(response2.text):
+                    time.sleep(5)  # Wait for a few seconds
+                    
+                    session.headers.update({
+                        "Referer": "https://www.like4like.org/user/earn-twitter-favorites.php",
+                        "Accept": "application/json, text/javascript, */*; q=0.01",
+                        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                        "Origin": "https://www.like4like.org"
+                    })
+
+                    data = {
+                        "url": f"https://twitter.com/intent/like?tweet_id={idlink}",
+                        "idlinka": f"{idlink}",
+                        "idzad": f"{taskId}",
+                        "addon": False,
+                        "version": "",
+                        "idclana": f"{code3}",
+                        "cnt": True,
+                        "vrsta": "favorites",
+                        "feature": "twitterfav"
+                    }
+
+                    response4 = session.post(
+                        "https://www.like4like.org/api/validate-task.php",
+                        data=data,
+                        cookies={"Cookie": cookies_like4like}
+                    )
+
+                    if '"success":true,' in str(response4.text) and '"credits"' in str(response4.text):
+                        penambahan_credits = re.search(r'"credits":"(.*?)"', str(response4.text)).group(1)
+                        print(
+                            Panel(f"""[bold white]Status :[bold green] {i18n.get_text('status.success')} in getting coins...
+[bold white]Tweet :[bold red] https://twitter.com/intent/like?tweet_id={idlink}
+[bold white]Credit :[bold green] {CREDITS['Total']}[bold white] >[bold green] {penambahan_credits}""", width=55, style="bold bright_white", title=f"[bold bright_white]>> [{i18n.get_text('status.success')}] <<")
+                        )
+                        SUKSES.append(f"{str(response4.text)}")
+                        CREDITS.update({"Total": penambahan_credits})
+                        time.sleep(1.5)
+                        return "0_0"
+                    else:
+                        print(f"[bold bright_white]   ──>[bold red] @{idlink} {i18n.get_text('errors.get_coins')}   ", end="\r")
+                        time.sleep(2.5)
+                        GAGAL.append(f"{response4.text}")
+                        return "0_0"
+                else:
+                    print(f"[bold bright_white]   ──>[bold red] {i18n.get_text('errors.no_task_code')}     ", end="\r")
+                    time.sleep(3.5)
+                    return "0_0"
+        elif "tasks" not in str(response.text):
+            print(f"[bold bright_white]   ──>[bold red] {i18n.get_text('messages.bot_detected')}        ", end="\r")
+            session.headers.clear()
+            time.sleep(4.5)
+            session.cookies.clear()
+            return "0_0"
+        else:
+            print(f"[bold bright_white]   ──>[bold red] {i18n.get_text('messages.no_missions')}              ", end="\r")
+            time.sleep(60)
+            return "0_0"
 
     def Follow(self, cookies_like4like: str, cookies_facebook: str) -> str:
         session.headers.update(
@@ -624,13 +722,17 @@ class Terminal:
         print(
             Panel(
                 r"""[bold red]●[bold yellow] ●[bold green] ●
-[bold red]  _      _ _        _  _   ____              _    
-[bold red] | |    (_) |      | || | |  _ \            | |   
-[bold red] | |     _| | _____| || |_| |_) | ___   ___ | | __
-[bold red] | |    | | |/ / _ \__   _|  _ < / _ \ / _ \| |/ /
-[bold red] | |____| |   <  __/  | | | |_) | (_) | (_) |   < 
-[bold white] |______|_|_|\_\___|  |_| |____/ \___/ \___/|_|\_\ 
-      [bold white on red]Like4Like Facebook - Coded by Rozhak & LavX""",
+[bold blue]                   _    _ _   _           
+[bold blue]                  | |  | | | | |          
+[bold blue]                  | |__|_  _|| |__        
+[bold blue]                  |____| |_| |____|       
+[bold purple]               ___        _  _        
+[bold purple]              / __| _  _ (_)| |_  ___ 
+[bold purple]              \__ \| || || ||  _|/ -_)
+[bold purple]              |___/ \_,_||_| \__|\___|
+                               
+
+                    [bold white on blue]Coded by LavX""",
                 width=55,
                 style="bold bright_white",
             )
@@ -640,6 +742,32 @@ class Terminal:
         return ("5580", "2")
 
 class Fitur:
+
+    def ensure_facebook_login(self):
+        """Ensure Facebook login is available, get it if needed"""
+        if not self.cookies_facebook:
+            print(Panel(f"[bold white]{i18n.get_text('login.browser_login.steps.facebook')}", width=55, style="bold bright_white"))
+            driver_fb = Pengaturan().launch_browser()
+            self.cookies_facebook = Pengaturan().get_facebook_cookies(driver_fb)
+            driver_fb.quit()
+            
+            if not self.cookies_facebook:
+                raise Exception("Facebook login failed")
+            
+            self.name, self.user = Pengaturan().Facebook(self.cookies_facebook)
+            
+            # Update cookies file with Facebook cookies
+            cookie_data = json.loads(open("Penyimpanan/Cookie.json", "r").read())
+            cookie_data["Facebook"] = self.cookies_facebook
+            with open("Penyimpanan/Cookie.json", "w") as w:
+                json.dump(cookie_data, w, indent=4, sort_keys=True)
+            
+            print(
+                Panel(f"""[bold white]{i18n.get_text('status.name')} :[bold green] {self.name}
+[bold white]Link :[bold red] https://web.facebook.com/{self.user}""", width=55, style="bold bright_white", title="[bold bright_white]>> [Facebook Connected] <<")
+            )
+            time.sleep(2.5)
+        return self.cookies_facebook
 
     def select_language(self):
         Terminal().Banner()
@@ -658,21 +786,16 @@ class Fitur:
     def __init__(self) -> None:
         try:
             self.select_language()
-            self.cookies_like4like = json.loads(open("Penyimpanan/Cookie.json", "r").read())["Like4Like"]
-            self.cookies_facebook = json.loads(open("Penyimpanan/Cookie.json", "r").read())["Facebook"]
+            cookie_data = json.loads(open("Penyimpanan/Cookie.json", "r").read())
+            self.cookies_like4like = cookie_data["Like4Like"]
+            self.cookies_facebook = cookie_data.get("Facebook")  # May not exist yet
+            
             self.credits = Pengaturan().Like4Like(self.cookies_like4like, Login=True)
             CREDITS.update({"Total": self.credits})
-            self.name, self.user = Pengaturan().Facebook(self.cookies_facebook)
+            
             print(
-                Columns(
-                    [
-                        Panel(
-                            f"[bold white]{i18n.get_text('status.name')} :[bold green] {str(self.name)[:16]}", width=27, style="bold bright_white"
-                        ),
-                        Panel(f"[bold white]{i18n.get_text('status.coins')} :[bold red] {str(self.credits)[:16]}", width=27, style="bold bright_white"
-                        )
-                    ]
-                )
+                Panel(f"[bold white]{i18n.get_text('status.coins')} :[bold red] {str(self.credits)[:16]}",
+                width=55, style="bold bright_white", title="[bold bright_white]>> [Status] <<")
             )
 
         except Exception as e:
@@ -686,17 +809,42 @@ class Fitur:
 [bold green]02[bold white]. {i18n.get_text('menu.follow_mission')}
 [bold green]03[bold white]. {i18n.get_text('menu.delete_links')}
 [bold green]04[bold white]. {i18n.get_text('menu.exchange_page')}
-[bold green]05[bold white]. {i18n.get_text('menu.exit')}
-[bold green]06[bold white]. Switch Language / Ganti Bahasa""", width=55, style="bold bright_white", subtitle="╭─────", subtitle_align="left", title=f"[bold bright_white]>> [Pengguna {self.jumlah}/{self.online} Online] <<",
+[bold green]05[bold white]. {i18n.get_text('menu.twitter_likes')}
+[bold green]06[bold white]. {i18n.get_text('menu.exit')}
+[bold green]07[bold white]. Switch Language / Ganti Bahasa""", width=55, style="bold bright_white", subtitle="╭─────", subtitle_align="left", title=f"[bold bright_white]>> [Pengguna {self.jumlah}/{self.online} Online] <<",
             )
         )
         pilihan = Console().input("[bold bright_white]   ╰─> ")
-        if pilihan == "06" or pilihan == "6":
+        if pilihan == "07" or pilihan == "7":
             i18n.switch_language()
             # Refresh menu by recreating it
             self.__init__()
             return
+        elif pilihan == "06" or pilihan == "6":
+            sys.exit()
+        elif pilihan == "05" or pilihan == "5":
+            print(Panel(f"[bold white]{i18n.get_text('actions.enter_delay')}", width=55, style="bold bright_white", title="[bold bright_white]>> [Mission Delay] <<", subtitle="╭─────", subtitle_align="left"))
+            delay = int(Console().input("[bold bright_white]   ╰─> "))
+            print(Panel(f"[bold white]{i18n.get_text('actions.running_mission')}", width=55, style="bold bright_white", title="[bold bright_white]>> [Notice] <<"))
+            while True:
+                try:
+                    Twitter().Like(self.cookies_like4like)
+                    Start().Delay(0, delay)
+                except RequestException:
+                    print(f"[bold bright_white]   ──>[bold yellow] {i18n.get_text('messages.connection_error')}              ", end="\r")
+                    time.sleep(5.5)
+                    continue
+                except KeyboardInterrupt:
+                    print(f"                                              ", end="\r")
+                    time.sleep(2.5)
+                    continue
+                except Exception as e:
+                    print(f"[bold bright_white]   ──>[bold red] {str(e).upper()}!", end="\r")
+                    time.sleep(10.5)
+                    break
+            sys.exit()
         elif pilihan == "01" or pilihan == "1":
+            self.ensure_facebook_login()
             print(Panel(f"[bold white]{i18n.get_text('menu.exchange_profile')}", width=55, style="bold bright_white", title="[bold bright_white]>> [Link Facebook] <<", subtitle="╭─────", subtitle_align="left"))
             fblink = Console().input("[bold bright_white]   ╰─> ")
             print(Panel(f"[bold white]{i18n.get_text('actions.enter_credits')}", width=55, style="bold bright_white", title="[bold bright_white]>> [Credits] <<", subtitle="╭─────", subtitle_align="left"))
@@ -705,6 +853,9 @@ class Fitur:
             Tukarkan().Profile(self.cookies_like4like, fblink, fbcredits, feature="facebookusersub")
             sys.exit()
         elif pilihan == "02" or pilihan == "2":
+            # Ensure we have Facebook login before proceeding
+            self.ensure_facebook_login()
+            
             print(Panel(f"[bold white]{i18n.get_text('actions.enter_delay')}", width=55, style="bold bright_white", title="[bold bright_white]>> [Mission Delay] <<", subtitle="╭─────", subtitle_align="left"))
             delay = int(Console().input("[bold bright_white]   ╰─> "))
             print(Panel(f"[bold white]{i18n.get_text('actions.running_mission')}", width=55, style="bold bright_white", title="[bold bright_white]>> [Notice] <<"))
@@ -732,6 +883,7 @@ class Fitur:
             print(Panel(f"[bold green]{i18n.get_text('actions.links_removed')}", width=55, style="bold bright_white", title=f"[bold bright_white]>> [{i18n.get_text('status.success')}] <<"))
             sys.exit()
         elif pilihan == "04" or pilihan == "4":
+            self.ensure_facebook_login()
             print(Panel(f"[bold white]{i18n.get_text('actions.enter_fanpage_link')}", width=55, style="bold bright_white", title="[bold bright_white]>> [Link Facebook] <<", subtitle="╭─────", subtitle_align="left"))
             fblink = Console().input("[bold bright_white]   ╰─> ")
             print(Panel(f"[bold white]{i18n.get_text('actions.enter_credits')}", width=55, style="bold bright_white", title="[bold bright_white]>> [Credits] <<", subtitle="╭─────", subtitle_align="left"))
