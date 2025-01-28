@@ -1,5 +1,5 @@
 # Like4Like Suite — Boost Your Social Media Presence! ✨
-![Like4Like Suite Logo](https://github.com/user-attachments/assets/f7989a7d-258a-405a-830c-bdee5aec1ad6)
+![Like4Like Suite Logo](https://github.com/user-attachments/assets/b9d7a0c6-8b20-4642-8555-fc15d3406c87)
 
 Welcome to **Like4Like Suite**! 🎉 This tool is based on [RozhakXD's Like4Book](https://github.com/RozhakXD/Like4Book), enhanced with additional features and improvements. It helps you gain social media followers in efficient way. With its easy-to-use features, you can boost your social presence without worrying about risks.
 
@@ -33,7 +33,7 @@ $ python Run.py
 ```
 
 ### Screenshots
-![FunPic_20241229](https://github.com/user-attachments/assets/097cd9d1-4c0b-42ac-8fe4-cc49a5dc27fa)
+![L4LSuite](https://github.com/user-attachments/assets/a003fada-b011-41bf-bdf1-6dca0596f57d)
 
 ### Troubleshooting 🛠️
 - **Connection Failed**: Ensure your internet connection is stable and try again after a while; also check Like4Like server status if issues persist.
