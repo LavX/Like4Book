@@ -2,3 +2,5 @@ requests>=2.31.0
 rich>=13.7.0
 selenium>=4.16.0
 undetected-chromedriver>=3.5.4
+PyQt6>=6.4.0
+qt-material
