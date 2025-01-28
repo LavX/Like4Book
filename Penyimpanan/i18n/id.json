@@ -31,12 +31,19 @@
             }
         }
     },
+    "messages": {
+        "no_missions": "Tidak ada misi yang tersedia saat ini",
+        "bot_detected": "Bot terdeteksi, mohon tunggu",
+        "connection_error": "Koneksi error, mencoba ulang",
+        "deleting_data": "Menghapus data akun Anda, mohon tunggu..."
+    },
     "menu": {
         "title": "Pilihan Yang Tersedia",
         "exchange_profile": "Tukarkan Koin Ke Pengikut (Profile)",
         "follow_mission": "Jalankan Misi Follow Facebook",
         "delete_links": "Hapus Link Yang Terhubung",
         "exchange_page": "Tukarkan Koin Ke Pengikut (Page)",
+        "twitter_likes": "Jalankan Misi Like Twitter",
         "exit": "Keluar (Exit)",
         "switch_language": "Switch Language / Ganti Bahasa",
         "select_option": "Pilih menu:"
