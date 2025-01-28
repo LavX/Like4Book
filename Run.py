@@ -903,13 +903,6 @@ class Fitur:
 
 if __name__ == "__main__":
     try:
-        if not os.path.exists("Penyimpanan/Subscribe.json"):
-            youtube_url = requests.get("https://raw.githubusercontent.com/RozhakXD/Like4Book/refs/heads/main/Penyimpanan/Youtube.json").json()["Link"]
-            os.system(f"xdg-open {youtube_url}")
-            with open("Penyimpanan/Subscribe.json", "w") as w:
-                json.dump({"Status": True}, w, indent=4)
-            time.sleep(2.5)
-        os.system("git pull")
         Fitur()
     except Exception as e:
         print(Panel(f"[bold red]{str(e).title()}!", width=55, style="bold bright_white", title="[bold bright_white]>> [Error] <<"))
