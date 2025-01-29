@@ -4,13 +4,45 @@
 Welcome to **Like4Like Suite**! 🎉 This tool is based on [RozhakXD's Like4Book](https://github.com/RozhakXD/Like4Book), enhanced with additional features and improvements. It helps you gain social media followers in efficient way. With its easy-to-use features, you can boost your social presence without worrying about risks.
 
 ### Key Features 🚀
-- **Facebook Profile Exchange**: Get followers for your Facebook profile by exchanging your collected coins. 💰➡️👥
-- **Facebook Page Exchange**: Boost your Facebook page followers through coin exchange. 📱➡️👥
-- **Facebook Follow Missions**: Execute missions to automatically gain more followers. 🏃‍♂️💨
-- **Twitter Like Missions**: Automatically earn coins by liking tweets (no Twitter login needed). 🐦❤️
-- **Smart Login System**: Only logs into services when needed for specific actions. 🔐
-- **Delete Connected Links**: Easily remove or archive unwanted links from your account. 🗑️🔗
-- **User-Friendly**: Clear interface and instructions make it easy to get started. 🖥️👌
+
+#### Twitter Features 🐦
+- **Twitter Follow**: Earn coins by following Twitter users
+- **Twitter Like**: Get credits for liking tweets
+- **Twitter Retweet**: Earn by retweeting content
+
+#### Facebook Features 📘
+- **Facebook Follow**: Earn credits by following Facebook profiles
+- **Facebook Subscribe**: Get coins for subscribing to profiles
+- **Facebook Like**: Earn by liking Facebook posts
+- **Facebook Share**: Get credits by sharing content
+- **Facebook Comment**: Earn coins through commenting
+
+#### Instagram Features 📸
+- **Instagram Follow**: Earn by following Instagram accounts
+- **Instagram Like**: Get credits for liking Instagram posts
+- **Instagram Comment**: Earn through Instagram comments
+
+#### TikTok Features 📱
+- **TikTok Follow**: Earn credits by following TikTok users
+- **TikTok Like**: Get coins for liking TikTok content
+
+#### Pinterest Features 📌
+- **Pinterest Follow**: Earn by following Pinterest users
+- **Pinterest Repin**: Get credits for repinning content
+
+#### SoundCloud Features 🎵
+- **SoundCloud Like**: Earn by liking tracks
+- **SoundCloud Follow**: Get credits for following users
+
+#### Other Platforms
+- **MySpace Connect**: Earn through MySpace connections
+- **ReverbNation Fan**: Get credits as a ReverbNation fan
+- **OK.ru Join**: Earn by joining OK.ru groups
+
+#### Additional Features ⚙️
+- **Profile Exchange**: Exchange earned coins for followers 💰➡️👥
+- **Smart Login**: Automatic login when needed 🔐 (only Like4Like needed!)
+- **Link Management**: Remove or archive unwanted links 🗑️
 
 ### Requirements 🔧
 - Python version 3.x or newer 🐍
@@ -33,7 +65,7 @@ $ python Run.py
 ```
 
 ### Screenshots
-![L4LSuite](https://github.com/user-attachments/assets/a003fada-b011-41bf-bdf1-6dca0596f57d)
+![L4LSuite](https://github.com/user-attachments/assets/0a4adf19-5185-4dd9-ae51-1c698ebb17a2)
 
 ### Troubleshooting 🛠️
 - **Connection Failed**: Ensure your internet connection is stable and try again after a while; also check Like4Like server status if issues persist.
@@ -42,8 +74,16 @@ $ python Run.py
 - **Failed to Get Credits**: Wait for the automated login process to complete and follow the on-screen instructions.
 - **Insufficient Credits**: Ensure you have at least 50 credits in your Like4Like account before attempting to exchange for followers.
 
-### Warning ⚠️
-> Usage of this tool must comply with social media platform policies and guidelines. Using unethical methods or violating terms of service may result in your account being suspended or deleted. Make sure to use Like4Like Suite wisely and responsibly. 🛑
+### ⚠️ DISCLAIMER - Educational Purposes Only ⚠️
+> **IMPORTANT**: This tool is a Proof of Concept (PoC) demonstrating automation vulnerabilities in Like4Like's platform. It is created for **EDUCATIONAL PURPOSES ONLY**.
+>
+> By using this software, you acknowledge:
+> - This is a security research tool showcasing poor validation mechanisms
+> - Usage may violate Like4Like's Terms of Service
+> - No responsibility is taken for account suspensions or terminations
+> - This is strictly for learning about web automation and security testing
+>
+> 🎓 Use this knowledge responsibly to understand the importance of proper security measures.
 
 ## Contributing 🤝
 We highly appreciate contributions from the community! If you have suggestions, fixes, or new features, please open an issue or send a pull request. Let's make Like4Like Suite better together! 🌟
