@@ -2,6 +2,7 @@
 
 import sys
 import time
+import json
 from typing import Tuple, Optional, Dict, Any
 
 from ...core.exceptions import AuthenticationError, FeatureError
@@ -44,6 +45,8 @@ from ...features.soundcloud.like import SoundCloudLikeFeature
 from ...features.myspace.connect import MySpaceConnectFeature
 from ...features.reverbnation.fan import ReverbNationFanFeature
 from ...features.okru.join import OkruJoinFeature
+
+from ...core.constants import FEATURE_TYPES, FEATURE_NAMES
 
 class MenuManager:
     """Manage CLI menu system and user interactions."""
@@ -287,53 +290,116 @@ class MenuManager:
             i18n.save_language_preference()
 
     def handle_all_features(self) -> None:
-        """Run all features in sequence with bot detection handling."""
+        """Run each feature continuously until bot detection, then skip for 10 minutes."""
         self.display.show_notice(i18n.get_text('actions.enter_delay'))
         try:
             delay = int(self.display.prompt(""))
-            self.display.show_notice(i18n.get_text('actions.running_mission'))
+            choice = str(current_feature_index + 3)  # Convert index to feature number
+            feature_name = FEATURE_NAMES.get(choice, f"Feature {choice}")
+            self.display.show_notice(f"Running {feature_name} mission, use CTRL + C if stuck and CTRL + Z to stop!")
             
             skipped_features = set()  # Track features to skip
+            current_feature_index = 0
+            feature_items = list(self.feature_map.items())
             
             while True:
-                for choice, (feature_obj, method) in self.feature_map.items():
+                if current_feature_index >= len(feature_items):
+                    current_feature_index = 0  # Reset to start if we've gone through all features
+                    
+                    # Remove features from skip list after 10 minutes
+                    if len(skipped_features) > 0:
+                        time.sleep(600)  # Wait 10 minutes
+                        skipped_features.clear()
+                        continue
+                
+                choice, (feature_obj, method) = feature_items[current_feature_index]
+                
+                # Skip if feature is in cooldown
+                if feature_obj in skipped_features:
+                    current_feature_index += 1
+                    continue
+                
+                # Run the feature repeatedly until bot detection
+                consecutive_failures = 0
+                current_delay = delay
+                last_error = None
+                
+                while consecutive_failures < 3:
                     try:
-                        # Skip if feature is in cooldown
-                        if feature_obj in skipped_features:
-                            continue
-                            
-                        # Run the feature
+                        # Get previous credits to compare
                         previous_credits = self.credits_service.get_balance(self.l4l_cookies)
+                        
+                        # Execute the feature
                         getattr(feature_obj, method)(self.l4l_cookies)
-                        time.sleep(delay)
+                        time.sleep(current_delay)
+                        
+                        # Get new credits balance
                         new_credits = self.credits_service.get_balance(self.l4l_cookies)
                         
-                        # Check for bot detection
+                        # Check if credits changed
                         if new_credits <= previous_credits:
-                            self.display.show_notice(f"Bot detection for feature {choice}. Skipping for 10 minutes.")
-                            skipped_features.add(feature_obj)
-                            continue
+                            consecutive_failures += 1
+                            current_delay += 5
+                            feature_name = FEATURE_NAMES.get(choice, f"Feature {choice}")
+                            self.display.show_notice(f"{feature_name} failed. Increasing delay to {current_delay} seconds.")
+                        else:
+                            consecutive_failures = 0
+                            current_delay = delay
                             
-                        # Show progress
-                        self.display.show_status(new_credits)
-                        stats = self.credits_service.get_statistics()
-                        self.display.show_progress(
-                            i18n.get_text('status.mission_progress'),
-                            int(stats['success_count']),
-                            int(stats['failed_count'])
-                        )
-                        
+                            # Show progress with feature name
+                            feature_name = FEATURE_NAMES.get(choice, f"Feature {choice}")
+                            self.display.show_status(new_credits)
+                            stats = self.credits_service.get_statistics()
+                            progress_msg = f"{i18n.get_text('status.mission_progress')} [Current: {feature_name}]"
+                            self.display.show_progress(
+                                progress_msg,
+                                int(stats['success_count']),
+                                int(stats['failed_count'])
+                            )
+                            
                     except KeyboardInterrupt:
                         return
                     except Exception as e:
-                        self.display.show_error(f"Error in feature {choice}: {str(e)}")
-                        continue
-                        
-                # Remove features from skip list after 10 minutes
-                current_time = time.time()
-                if len(skipped_features) > 0:
-                    time.sleep(600)  # Wait 10 minutes
-                    skipped_features.clear()
+                        error_msg = str(e)
+                        if "Task response body:" in error_msg:
+                            try:
+                                # Extract just the JSON response
+                                response_start = error_msg.index('{"success"')
+                                raw_response = error_msg[response_start:]
+                                parsed = json.loads(raw_response)
+                                # Skip immediately on permanent errors
+                                if "Invalid call" in parsed.get("error", ""):
+                                    self.display.show_error(parsed["error"].replace("<br>", ""))
+                                    skipped_features.add(feature_obj)
+                                    break
+                                # For other errors, show cleaned message
+                                error_msg = parsed.get("error", "").replace("<br>", "\n").strip()
+                            except (ValueError, json.JSONDecodeError, KeyError):
+                                pass
+                        consecutive_failures += 1
+                        current_delay += 5
+                        last_error = error_msg
+                        feature_name = FEATURE_NAMES.get(choice, f"Feature {choice}")
+                        self.display.show_error(f"Error in {feature_name}: {error_msg}")
+                
+                # After 3 failures, add to skip list and move to next if not already skipped
+                if consecutive_failures >= 3 and feature_obj not in skipped_features:
+                    error_msg = last_error if last_error else "Maximum interaction count reached"
+                    # Clean up the display of JSON response if present
+                    if "Task response body:" in error_msg:
+                        try:
+                            response_start = error_msg.index('{"success"')
+                            raw_response = error_msg[response_start:]
+                            parsed = json.loads(raw_response)
+                            error_msg = parsed.get("error", error_msg).replace("<br>", "\n").strip()
+                        except (ValueError, json.JSONDecodeError, KeyError):
+                            pass
+                    feature_name = FEATURE_NAMES.get(choice, f"Feature {choice}")
+                    self.display.show_notice(f"{feature_name} blocked: {error_msg}")
+                    self.display.show_notice("Skipping for 10 minutes.")
+                    skipped_features.add(feature_obj)
+                
+                current_feature_index += 1
                     
         except ValueError:
             self.display.show_error(i18n.get_text('errors.invalid_delay'))

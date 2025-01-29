@@ -67,14 +67,18 @@ class TwitterFollowFeature:
                 cookies={"Cookie": cookies}
             )
 
-            if SUCCESS_CODES['LIKE4LIKE_SUCCESS'] in response.text and "twitter.com" in response.text:
-                tasks = json.loads(response.text)["data"]["tasks"]
-                return tasks[0] if tasks else None
-            elif "tasks" not in response.text:
-                raise FeatureError("Bot detection triggered")
-            else:
-                return None
-
+            response_data = response.text
+            try:
+                parsed = json.loads(response_data)
+                if SUCCESS_CODES['LIKE4LIKE_SUCCESS'] in response_data and "twitter.com" in response_data:
+                    tasks = parsed["data"]["tasks"]
+                    return tasks[0] if tasks else None
+                elif "error" in parsed:
+                    raise FeatureError(f"Task response body: {response_data}")
+                else:
+                    return None
+            except json.JSONDecodeError:
+                raise FeatureError(f"Invalid response format: {response_data}")
         except Exception as e:
             raise FeatureError(f"Failed to get Twitter follow task: {str(e)}")
 

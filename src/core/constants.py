@@ -43,6 +43,30 @@ SUCCESS_CODES = {
     "LIKE4LIKE_CREDITS": '"credits"'
 }
 
+# Feature display names
+FEATURE_NAMES = {
+    "3": "Twitter Follow",
+    "4": "Twitter Like",
+    "5": "Twitter Retweet",
+    "6": "Facebook Follow",
+    "7": "Facebook Subscribe",
+    "8": "Facebook Like",
+    "9": "Facebook Share",
+    "10": "Facebook Comment",
+    "11": "Instagram Follow",
+    "12": "Instagram Like",
+    "13": "Instagram Comment",
+    "14": "TikTok Follow",
+    "15": "TikTok Like",
+    "16": "Pinterest Follow",
+    "17": "Pinterest Repin",
+    "18": "SoundCloud Like",
+    "19": "SoundCloud Follow",
+    "20": "MySpace Connect",
+    "21": "ReverbNation Fan",
+    "22": "OK.ru Join"
+}
+
 # Feature types
 FEATURE_TYPES = {
     # Twitter features
