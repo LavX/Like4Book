@@ -6,7 +6,8 @@
         "browser_login": {
             "facebook": "Please login to Facebook in the browser window",
             "like4like": "Please login to Like4Like in the browser window",
-            "launch_failed": "Failed to launch browser",
+            "launch_failed": "Failed to launch browser. Please try again.",
+            "closed": "Browser was closed. You can try again or paste cookies manually.",
             "cookies_failed": {
                 "facebook": "Failed to get Facebook cookies",
                 "like4like": "Failed to get Like4Like cookies"
@@ -46,7 +47,12 @@
         "twitter_likes": "Run Twitter Like Mission",
         "exit": "Exit",
         "switch_language": "Switch Language / Ganti Bahasa",
-        "select_option": "Select option:"
+        "select_option": "Select option:",
+        "language": {
+            "english": "English",
+            "indonesian": "Indonesian (Bahasa Indonesia)",
+            "select": "Select Language"
+        }
     },
     "status": {
         "success": "Success",
@@ -57,10 +63,37 @@
         "failed_count": "FAILED",
         "name": "Name",
         "coins": "Coins",
-        "user": "User"
+        "progress": "Progress",
+        "delay_between_actions": "Delay between actions",
+        "user": "User",
+        "status": "Status",
+        "link": "Link",
+        "facebook_connected": "Facebook Connected",
+        "mission_progress": "Mission Progress",
+        "language_changed": "Language changed successfully",
+        "exchange_success": "Exchange completed successfully",
+        "cookies_saved": "Cookies saved successfully",
+        "seconds": "seconds"
+    },
+    "interface": {
+        "available_missions": "Available Missions",
+        "facebook_follow": "Facebook Follow Mission",
+        "twitter_like": "Twitter Like Mission",
+        "like4like_management": "Like4Like Management",
+        "browser_cookies": "Get Cookies from Browser",
+        "paste_cookies": "Paste cookies here...",
+        "l4l_cookies": "Like4Like Cookies",
+        "fb_cookies": "Facebook Cookies",
+        "exchange_followers": "Exchange Coins for Followers",
+        "delete_links": "Delete Connected Links"
+    },
+    "dialog": {
+        "facebook_mission_title": "Facebook Follow Mission",
+        "twitter_mission_title": "Twitter Like Mission"
     },
     "actions": {
         "enter_profile_link": "Please enter Facebook Profile link, make sure the account has a Follow button!",
+        "enter_profile": "Profile URL:",
         "enter_credits": "Please enter credits to use (2-21), enter just one value, example: 15",
         "processing_exchange": "Processing exchange to followers, make sure you have more than 50 credits for server processing!",
         "enter_delay": "Please enter Follow mission delay, recommended to use above 60 seconds!",
@@ -69,7 +102,13 @@
         "links_removed": "All connected links have been removed or archived from your account!",
         "enter_fanpage_link": "Please enter Facebook Fanpage link, make sure it has a Follow button!",
         "invalid_option": "The option you entered is not available!",
-        "deleting_data": "Deleting your account data, please wait..."
+        "deleting_data": "Deleting your account data, please wait...",
+        "start": "Start",
+        "stop": "Stop",
+        "close": "Close",
+        "save": "Save",
+        "exchange": "Exchange",
+        "mission_stopped": "Mission stopped"
     },
     "errors": {
         "get_coins": "Failed to get coins!",
@@ -81,6 +120,12 @@
         "no_user_found": "No related user found...",
         "failed_follow": "Failed to follow",
         "facebook_link_used": "Facebook link is already used by another user, please use previous Like4Like account!",
-        "cannot_exchange_credits": "Cannot exchange credits for followers, please try manual exchange!"
+        "cannot_exchange_credits": "Cannot exchange credits for followers, please try manual exchange!",
+        "not_logged_in": "You must be logged in to perform this action",
+        "invalid_profile": "Please enter a valid profile URL",
+        "exchange_failed": "Failed to exchange credits for followers",
+        "invalid_choice": "Invalid choice selected", 
+        "invalid_cookies": "Please enter valid cookies",
+        "browser_unavailable": "Browser service not available"
     }
 }

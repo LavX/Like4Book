@@ -6,7 +6,8 @@
         "browser_login": {
             "facebook": "Silahkan login ke Facebook di jendela browser",
             "like4like": "Silahkan login ke Like4Like di jendela browser",
-            "launch_failed": "Gagal membuka browser",
+            "launch_failed": "Gagal membuka browser. Silakan coba lagi.",
+            "closed": "Browser ditutup. Anda dapat mencoba lagi atau menempelkan cookies secara manual.",
             "cookies_failed": {
                 "facebook": "Gagal mendapatkan cookies Facebook",
                 "like4like": "Gagal mendapatkan cookies Like4Like"
@@ -46,7 +47,12 @@
         "twitter_likes": "Jalankan Misi Like Twitter",
         "exit": "Keluar (Exit)",
         "switch_language": "Switch Language / Ganti Bahasa",
-        "select_option": "Pilih menu:"
+        "select_option": "Pilih opsi:",
+        "language": {
+            "english": "Bahasa Inggris",
+            "indonesian": "Bahasa Indonesia",
+            "select": "Pilih Bahasa"
+        }
     },
     "status": {
         "success": "Sukses",
@@ -57,10 +63,31 @@
         "failed_count": "GAGAL",
         "name": "Nama",
         "coins": "Koin",
-        "user": "Pengguna"
+        "user": "Pengguna",
+        "status": "Status",
+        "link": "Tautan",
+        "facebook_connected": "Facebook Terhubung",
+        "mission_progress": "Kemajuan Misi",
+        "language_changed": "Bahasa berhasil diubah",
+        "exchange_success": "Penukaran berhasil dilakukan",
+        "cookies_saved": "Cookies berhasil disimpan",
+        "seconds": "detik"
+    },
+    "interface": {
+        "available_missions": "Misi Yang Tersedia",
+        "facebook_follow": "Misi Follow Facebook",
+        "twitter_like": "Misi Like Twitter",
+        "like4like_management": "Manajemen Like4Like",
+        "browser_cookies": "Dapatkan Cookies dari Browser",
+        "paste_cookies": "Tempel cookies di sini...",
+        "l4l_cookies": "Cookies Like4Like",
+        "fb_cookies": "Cookies Facebook",
+        "exchange_followers": "Tukar Koin untuk Pengikut",
+        "delete_links": "Hapus Link Terhubung"
     },
     "actions": {
         "enter_profile_link": "Silahkan Masukkan Link Profile Facebook, Pastikan Akun Hanya Memiliki Tombol Ikuti!",
+        "enter_profile": "URL Profil:",
         "enter_credits": "Silahkan Masukkan Credits Yang Ingin Digunakan Dari (2-21), Harap Masukkan Satu Saja, Misalnya: 15",
         "processing_exchange": "Kami Sedang Mencoba Menukarkan Credits Ke Pengikut, Pastikan Anda Memiliki Lebih Dari 50 Kredit Agar Dapat Diproses Oleh Server!",
         "enter_delay": "Silahkan Masukkan Delay Misi Follow, Sebaiknya Gunakan Delay Di Atas 60 Detik!",
@@ -69,7 +96,13 @@
         "links_removed": "Kami Sudah Menghapus Atau Mengarsipkan Semua Tautan Yang Terhubung Di Akun Anda!",
         "enter_fanpage_link": "Silahkan Masukkan Link Fanspage Facebook, Pastikan Link Sudah Benar Dan Ada Tombol Ikuti!",
         "invalid_option": "Pilihan Yang Kamu Masukkan Tidak Tersedia Dalam Fitur!",
-        "deleting_data": "Sedang Mencoba Menghapus Data Akun Kamu, Mohon Tunggu Sebentar!"
+        "deleting_data": "Sedang Mencoba Menghapus Data Akun Kamu, Mohon Tunggu Sebentar!",
+        "start": "Mulai",
+        "stop": "Berhenti",
+        "close": "Tutup",
+        "save": "Simpan",
+        "exchange": "Tukar",
+        "mission_stopped": "Misi dihentikan"
     },
     "errors": {
         "get_coins": "GAGAL MENDAPATKAN KOIN!",
@@ -80,7 +113,13 @@
         "failed_delete": "GAGAL MENGHAPUS",
         "no_user_found": "TIDAK MENEMUKAN USER YANG TERKAIT...",
         "failed_follow": "GAGAL MENGIKUTI",
-        "facebook_link_used": "Link Facebook Anda Sudah Dipkai Oleh Pengguna Lain, Silakan Gunakan Akun Like4Like Sebelumnya!",
-        "cannot_exchange_credits": "Tidak Bisa Menukarkan Credits Ke Pengikut, Silahkan Coba Tukarkan Secara Manual!"
+        "facebook_link_used": "Link Facebook Anda Sudah Dipakai Oleh Pengguna Lain, Silakan Gunakan Akun Like4Like Sebelumnya!",
+        "cannot_exchange_credits": "Tidak Bisa Menukarkan Credits Ke Pengikut, Silahkan Coba Tukarkan Secara Manual!",
+        "not_logged_in": "Anda harus login terlebih dahulu untuk melakukan tindakan ini",
+        "invalid_profile": "Silakan masukkan URL profil yang valid",
+        "exchange_failed": "Gagal menukar koin ke pengikut",
+        "invalid_choice": "Pilihan tidak valid",
+        "invalid_cookies": "Silakan masukkan cookies yang valid",
+        "browser_unavailable": "Layanan browser tidak tersedia"
     }
 }
