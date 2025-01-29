@@ -28,44 +28,27 @@ class DisplayManager:
         self.console.print(
             Panel(
                 r"""[bold red]●[bold yellow] ●[bold green] ●
-[bold blue]                   _    _ _   _           
-[bold blue]                  | |  | | | | |          
-[bold blue]                  | |__|_  _|| |__        
-[bold blue]                  |____| |_| |____|       
-[bold purple]               ___        _  _        
-[bold purple]              / __| _  _ (_)| |_  ___ 
-[bold purple]              \__ \| || || ||  _|/ -_)
-[bold purple]              |___/ \_,_||_| \__|\___|
+[bold blue]                  _    _ _   _           
+[bold blue]                 | |  | | | | |          
+[bold blue]                 | |__|_  _|| |__        
+[bold blue]                 |____| |_| |____|       
+[bold purple]              ___        _  _        
+[bold purple]             / __| _  _ (_)| |_  ___ 
+[bold purple]             \__ \| || || ||  _|/ -_)
+[bold purple]             |___/ \_,_||_| \__|\___|
                                
 
-                     [bold white on blue]Coded by LavX""",
+                  [bold white on blue]Coded by LavX""",
                 width=55,
                 style="bold bright_white",
             )
         )
-    def show_status(self,
-        credits: str,
-        name: Optional[str] = None,
-        user_id: Optional[str] = None
-    ) -> None:
+    def show_status(self, credits: str) -> None:
         """Display status panel.
         
         Args:
             credits: Current credit balance
-            name: Optional user name
-            user_id: Optional user ID
         """
-        if name and user_id:
-            self.console.print(
-                Panel(
-                    f"""[bold white]{i18n.get_text('status.name')} :[bold green] {name}
-[bold white]{i18n.get_text('status.link')} :[bold red] https://web.facebook.com/{user_id}""",
-                    width=55,
-                    style="bold bright_white",
-                    title=f"[bold bright_white]>> [{i18n.get_text('status.facebook_connected')}] <<"
-                )
-            )
-        
         self.console.print(
             Panel(
                 f"[bold white]{i18n.get_text('status.coins')} :[bold red] {credits}",
@@ -79,13 +62,50 @@ class DisplayManager:
         """Display main menu."""
         self.console.print(
             Panel(
-                f"""[bold green]01[bold white]. {i18n.get_text('menu.exchange_profile')}
-[bold green]02[bold white]. {i18n.get_text('menu.follow_mission')}
-[bold green]03[bold white]. {i18n.get_text('menu.delete_links')}
-[bold green]04[bold white]. {i18n.get_text('menu.exchange_page')}
-[bold green]05[bold white]. {i18n.get_text('menu.twitter_likes')}
-[bold green]06[bold white]. {i18n.get_text('menu.exit')}
-[bold green]07[bold white]. {i18n.get_text('menu.switch_language')}""",
+                f"""[bold yellow]0[bold white] Run All Features
+
+[bold cyan]Profile Management[bold white]
+[bold green]1[bold white] {i18n.get_text('menu.exchange_profile')}
+[bold green]2[bold white] {i18n.get_text('menu.exchange_page')}
+
+[bold cyan]Twitter Features[bold white]
+[bold green]3[bold white] Twitter Follow Mission
+[bold green]4[bold white] Twitter Like Mission
+[bold green]5[bold white] Twitter Retweet Mission
+
+[bold cyan]Facebook Features[bold white]
+[bold green]6[bold white] Facebook Follow Mission
+[bold green]7[bold white] Facebook Profile Follow Mission
+[bold green]8[bold white] Facebook Like Mission
+[bold green]9[bold white] Facebook Share Mission
+[bold green]10[bold white] Facebook Comment Mission
+
+[bold cyan]Instagram Features[bold white]
+[bold green]11[bold white] Instagram Follow Mission
+[bold green]12[bold white] Instagram Like Mission
+[bold green]13[bold white] Instagram Comment Mission
+
+[bold cyan]TikTok Features[bold white]
+[bold green]14[bold white] TikTok Follow Mission
+[bold green]15[bold white] TikTok Like Mission
+
+[bold cyan]Pinterest Features[bold white]
+[bold green]16[bold white] Pinterest Follow Mission
+[bold green]17[bold white] Pinterest Repin Mission
+
+[bold cyan]SoundCloud Features[bold white]
+[bold green]18[bold white] SoundCloud Like Mission
+[bold green]19[bold white] SoundCloud Follow Mission
+
+[bold cyan]Other Platforms[bold white]
+[bold green]20[bold white] MySpace Connect Mission
+[bold green]21[bold white] ReverbNation Fan Mission
+[bold green]22[bold white] OK.ru Join Mission
+
+[bold cyan]Management[bold white]
+[bold green]23[bold white] {i18n.get_text('menu.delete_links')}
+[bold green]24[bold white] {i18n.get_text('menu.switch_language')}
+[bold green]25[bold white] {i18n.get_text('menu.exit')}""",
                 width=55,
                 style="bold bright_white",
                 subtitle="╭─────",

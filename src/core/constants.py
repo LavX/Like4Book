@@ -12,7 +12,6 @@ LONG_DELAY = 10.5  # seconds
 SHORT_DELAY = 2.5  # seconds
 
 # URLs
-FACEBOOK_BASE_URL = "https://web.facebook.com"
 LIKE4LIKE_BASE_URL = "https://www.like4like.org"
 
 # File paths
@@ -46,7 +45,41 @@ SUCCESS_CODES = {
 
 # Feature types
 FEATURE_TYPES = {
-    "FACEBOOK_USER_SUB": "facebookusersub",
-    "FACEBOOK_SUB": "facebooksub",
-    "TWITTER_FAV": "twitterfav"
+    # Twitter features
+    "TWITTER_FAV": "twitterfav",
+    "TWITTER_FOLLOW": "twitterfol",
+    "TWITTER_RETWEET": "twitterret",
+    
+    # Instagram features
+    "INSTAGRAM_FOLLOW": "instagramfol",
+    "INSTAGRAM_LIKE": "instagramlik",
+    "INSTAGRAM_COMMENT": "instagramcom",
+    
+    # Facebook features
+    "FACEBOOK_FOLLOW": "facebookfol",
+    "FACEBOOK_PROFILE_FOLLOW": "facebookproffol",
+    "FACEBOOK_LIKE": "facebooklik",
+    "FACEBOOK_SHARE": "facebooksha",
+    "FACEBOOK_COMMENT": "facebookcom",
+    
+    # TikTok features
+    "TIKTOK_FOLLOW": "tiktokfol",
+    "TIKTOK_LIKE": "tiktoklik",
+    
+    # Pinterest features
+    "PINTEREST_FOLLOW": "pinterestfol",
+    "PINTEREST_REPIN": "pinterestpin",
+    
+    # SoundCloud features
+    "SOUNDCLOUD_LIKE": "soundcloudlik",
+    "SOUNDCLOUD_FOLLOW": "soundcloudfol",
+    
+    # MySpace feature
+    "MYSPACE_CONNECT": "myspacecon",
+    
+    # ReverbNation feature
+    "REVERBNATION_FAN": "reverbnationfan",
+    
+    # OK.ru feature
+    "OKRU_JOIN": "okrujoi"
 }

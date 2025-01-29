@@ -36,7 +36,7 @@ class Like4LikeAuth:
                 json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             with open(COOKIE_FILE_PATH, "w") as f:
-                json.dump({"Like4Like": None, "Facebook": None}, f, indent=4)
+                json.dump({"Like4Like": None}, f, indent=4)
 
     def get_cookies_from_browser(self, driver: uc.Chrome) -> Optional[str]:
         """Get Like4Like cookies after manual login.
@@ -53,9 +53,9 @@ class Like4LikeAuth:
         try:
             driver.get(f"{LIKE4LIKE_BASE_URL}/login/")
             
-            # Wait for successful login by checking for earn feature page
+            # Wait for successful login by checking for any earn feature page
             WebDriverWait(driver, BROWSER_WAIT_TIMEOUT).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "a[href*='earn-facebook-subscribes.php']"))
+                EC.presence_of_element_located((By.CSS_SELECTOR, "a[href*='earn-']"))
             )
             
             # Additional delay to ensure cookies are set

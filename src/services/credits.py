@@ -17,23 +17,40 @@ class CreditsService:
         self.success_count = 0
         self.failed_count = 0
 
-    def get_balance(self, cookies: str) -> str:
-        """Get current credit balance.
+    def get_balance(self, cookies: str, max_retries: int = 3, delay: float = 2.0) -> str:
+        """Get current credit balance with retry logic.
         
         Args:
             cookies: Like4Like cookie string
+            max_retries: Maximum number of retry attempts (default: 3)
+            delay: Base delay between retries in seconds (default: 2.0)
             
         Returns:
             str: Current credit balance
             
         Raises:
-            CreditExchangeError: If balance check fails
+            CreditExchangeError: If balance check fails after all retries
         """
-        try:
-            self.total_credits = self.like4like.get_credits(cookies)
-            return self.total_credits
-        except Exception as e:
-            raise CreditExchangeError(f"Failed to get credit balance: {str(e)}")
+        last_error = None
+        
+        for attempt in range(max_retries):
+            try:
+                if attempt > 0:
+                    # Exponential backoff delay
+                    retry_delay = delay * (2 ** (attempt - 1))
+                    time.sleep(retry_delay)
+                
+                self.total_credits = self.like4like.get_credits(cookies)
+                return self.total_credits
+                
+            except Exception as e:
+                last_error = e
+                
+                # If this was the last attempt, raise the error
+                if attempt == max_retries - 1:
+                    raise CreditExchangeError(
+                        f"Failed to get credit balance after {max_retries} attempts: {str(last_error)}"
+                    )
 
     def calculate_followers(self, credits: str, cost_per_follower: int) -> int:
         """Calculate potential followers based on credits and cost.
@@ -49,51 +66,6 @@ class CreditsService:
             return int(float(credits) / float(cost_per_follower))
         except (ValueError, ZeroDivisionError):
             return 0
-
-    def exchange_for_followers(
-        self,
-        cookies: str,
-        profile_url: str,
-        credits_per_follower: int,
-        feature_type: str = FEATURE_TYPES['FACEBOOK_USER_SUB']
-    ) -> bool:
-        """Exchange credits for followers.
-        
-        Args:
-            cookies: Like4Like cookie string
-            profile_url: Target profile URL
-            credits_per_follower: Credits to spend per follower
-            feature_type: Type of feature to exchange for
-            
-        Returns:
-            bool: True if exchange successful
-            
-        Raises:
-            CreditExchangeError: If exchange fails
-        """
-        try:
-            exchange_data = {
-                "fblink": profile_url,
-                "fbcredits": credits_per_follower,
-                "fbdescription": "",
-                "idclana": "3740207"  # TODO: Make this configurable
-            }
-            
-            success = self.like4like.exchange_credits(
-                cookies=cookies,
-                feature=feature_type,
-                target_data=exchange_data
-            )
-            
-            if success:
-                # Update credit balance after successful exchange
-                self.get_balance(cookies)
-                return True
-            else:
-                raise CreditExchangeError("Exchange request failed")
-                
-        except Exception as e:
-            raise CreditExchangeError(f"Failed to exchange credits: {str(e)}")
 
     def record_success(self) -> None:
         """Record a successful credit operation."""

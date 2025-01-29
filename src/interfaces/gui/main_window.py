@@ -10,11 +10,9 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont
 
 from ...i18n.manager import i18n
-from ...auth.facebook import FacebookAuth
 from ...auth.like4like import Like4LikeAuth
 from ...services.credits import CreditsService
 from ...services.browser import BrowserService
-from ...features.facebook.follow import FacebookFollowFeature
 from ...features.twitter.like import TwitterLikeFeature
 from .dialogs import ProfileExchangeDialog, MissionDialog, LanguageDialog, CookieDialog
 
@@ -26,23 +24,18 @@ class MainWindow(QMainWindow):
         super().__init__()
         
         # Initialize services
-        self.facebook_auth = FacebookAuth()
         self.like4like_auth = Like4LikeAuth()
         self.credits_service = CreditsService()
         self.browser_service = BrowserService()
         
         # Feature modules
-        self.facebook_feature = FacebookFollowFeature()
         self.twitter_feature = TwitterLikeFeature()
         
         # Share credits service with features
-        self.facebook_feature.credits_service = self.credits_service
         self.twitter_feature.credits_service = self.credits_service
         
         # State
-        self.fb_cookies = None
         self.l4l_cookies = None
-        self.user_info = None
         
         self.setup_ui()
         self.init_auth()
@@ -101,21 +94,11 @@ class MainWindow(QMainWindow):
         settings_layout = QVBoxLayout(settings_group)
         settings_layout.setSpacing(10)
         
-        # Cookie management buttons
-        cookie_layout = QHBoxLayout()
-        cookie_layout.setSpacing(10)
-        
+        # Cookie management button
         l4l_cookie_btn = QPushButton("🔑 Like4Like Cookies")
         l4l_cookie_btn.clicked.connect(lambda: self.handle_cookies("like4like"))
         l4l_cookie_btn.setMinimumHeight(40)
-        cookie_layout.addWidget(l4l_cookie_btn)
-        
-        fb_cookie_btn = QPushButton("🔑 Facebook Cookies")
-        fb_cookie_btn.clicked.connect(lambda: self.handle_cookies("facebook"))
-        fb_cookie_btn.setMinimumHeight(40)
-        cookie_layout.addWidget(fb_cookie_btn)
-        
-        settings_layout.addLayout(cookie_layout)
+        settings_layout.addWidget(l4l_cookie_btn)
         
         # Management buttons
         exchange_btn = QPushButton("💱 Exchange Coins for Followers")
@@ -165,7 +148,6 @@ class MainWindow(QMainWindow):
             # Load and validate Like4Like session
             cookies = self.like4like_auth.load_cookies()
             self.l4l_cookies = cookies.get("Like4Like")
-            self.fb_cookies = cookies.get("Facebook")
             
             # If Like4Like cookies are missing, open cookie dialog
             if not self.l4l_cookies:
@@ -203,32 +185,17 @@ class MainWindow(QMainWindow):
         """Handle cookie management.
         
         Args:
-            cookie_type: Type of cookies to manage ("like4like" or "facebook")
+            cookie_type: Type of cookies to manage ("like4like")
         """
-        current_cookies = self.l4l_cookies if cookie_type == "like4like" else self.fb_cookies
-        auth_service = self.like4like_auth if cookie_type == "like4like" else self.facebook_auth
-        
         def save_cookies(cookies: str):
             """Save cookies callback.
             
             Args:
                 cookies: Cookie string to save
             """
-            stored_cookies = self.like4like_auth.load_cookies()
-            stored_cookies[cookie_type.title()] = cookies
+            stored_cookies = {"Like4Like": cookies}
             self.like4like_auth.save_cookies(stored_cookies)
-            
-            # Update instance state
-            if cookie_type == "like4like":
-                self.l4l_cookies = cookies
-            else:
-                self.fb_cookies = cookies
-                
-            # Validate Facebook user if needed
-            if cookie_type == "facebook":
-                name, user_id = self.facebook_auth.validate_user(cookies)
-                self.user_info = {"name": name, "id": user_id}
-                
+            self.l4l_cookies = cookies
             self.update_status()
         
         dialog = CookieDialog(
@@ -263,18 +230,12 @@ class MainWindow(QMainWindow):
             self.handle_cookies("like4like")
             return
             
-        if not self.fb_cookies:
-            self.show_error(i18n.get_text('errors.not_logged_in'))
-            self.handle_cookies("facebook")
-            return
-            
         dialog = MissionDialog(
             self,
             mission_type="follow",
-            feature=self.facebook_feature,
+            feature=self.twitter_feature,  # Using Twitter method for Facebook follows
             credits_service=self.credits_service,
-            l4l_cookies=self.l4l_cookies,
-            fb_cookies=self.fb_cookies
+            l4l_cookies=self.l4l_cookies
         )
         dialog.exec()
         self.update_status()

@@ -1,4 +1,4 @@
-"""Facebook profile follow feature implementation."""
+"""Facebook comment feature implementation."""
 
 import json
 import time
@@ -10,16 +10,16 @@ from ...core.exceptions import FeatureError
 from ...services.credits import CreditsService
 from ...utils.http import create_session, make_request
 
-class FacebookFollowFeature:
-    """Handle Facebook profile follow operations through Like4Like."""
+class FacebookCommentFeature:
+    """Handle Facebook comment operations through Like4Like."""
 
     def __init__(self):
-        """Initialize Facebook follow feature."""
+        """Initialize Facebook comment feature."""
         self.session = create_session()
         self.credits_service = CreditsService()
 
-    def get_follow_task(self, cookies: str) -> Optional[Dict]:
-        """Get a Facebook follow task from Like4Like.
+    def get_comment_task(self, cookies: str) -> Optional[Dict]:
+        """Get a Facebook comment task from Like4Like.
         
         Args:
             cookies: Like4Like cookie string
@@ -45,14 +45,14 @@ class FacebookFollowFeature:
             # Get initial page
             response = make_request(
                 method="GET",
-                url=f"{LIKE4LIKE_BASE_URL}/user/earn-facebook-user-follow.php",
+                url=f"{LIKE4LIKE_BASE_URL}/user/earn-facebook-comments.php",
                 session=self.session,
                 cookies={"Cookie": cookies}
             )
 
             # Update headers for task request
             self.session.headers.update({
-                "Referer": f"{LIKE4LIKE_BASE_URL}/user/earn-facebook-user-follow.php",
+                "Referer": f"{LIKE4LIKE_BASE_URL}/user/earn-facebook-comments.php",
                 "X-Requested-With": "XMLHttpRequest",
                 "Accept": "application/json, text/javascript, */*; q=0.01",
                 "Sec-Fetch-Dest": "empty",
@@ -62,7 +62,7 @@ class FacebookFollowFeature:
             # Get task
             response = make_request(
                 method="GET",
-                url=f"{LIKE4LIKE_BASE_URL}/api/get-tasks.php?feature=facebookusersub",
+                url=f"{LIKE4LIKE_BASE_URL}/api/get-tasks.php?feature=facebookcom",
                 session=self.session,
                 cookies={"Cookie": cookies}
             )
@@ -76,10 +76,10 @@ class FacebookFollowFeature:
                 return None
 
         except Exception as e:
-            raise FeatureError(f"Failed to get Facebook follow task: {str(e)}")
+            raise FeatureError(f"Failed to get Facebook comment task: {str(e)}")
 
     def start_task(self, cookies: str, task: Dict) -> bool:
-        """Start a Facebook follow task.
+        """Start a Facebook comment task.
         
         Args:
             cookies: Like4Like cookie string
@@ -105,9 +105,9 @@ class FacebookFollowFeature:
                 cookies={"Cookie": cookies},
                 params={
                     "idzad": task["idlink"],
-                    "vrsta": "follow",
+                    "vrsta": "postb",
                     "idcod": task["taskId"],
-                    "feature": "facebookusersub",
+                    "feature": "facebookcom",
                     "_": timestamp
                 }
             )
@@ -118,7 +118,7 @@ class FacebookFollowFeature:
             raise FeatureError(f"Failed to start task: {str(e)}")
 
     def validate_task(self, cookies: str, task: Dict) -> bool:
-        """Validate a completed Facebook follow task.
+        """Validate a completed Facebook comment task.
         
         Args:
             cookies: Like4Like cookie string
@@ -131,26 +131,26 @@ class FacebookFollowFeature:
             FeatureError: If validation fails
         """
         try:
-            # Wait for follow action to register
+            # Wait for comment action to register
             time.sleep(5)
             
             self.session.headers.update({
-                "Referer": f"{LIKE4LIKE_BASE_URL}/user/earn-facebook-user-follow.php",
+                "Referer": f"{LIKE4LIKE_BASE_URL}/user/earn-facebook-comments.php",
                 "Accept": "application/json, text/javascript, */*; q=0.01",
                 "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
                 "Origin": f"{LIKE4LIKE_BASE_URL}"
             })
             
             data = {
-                "url": task["idlink"],  # Already full URL for user follow
+                "url": f"https://www.facebook.com/{task['idlink']}",
                 "idlinka": task["idlink"],
                 "idzad": task["taskId"],
                 "addon": "false",
                 "version": "",
                 "idclana": task["code3"],
                 "cnt": "true",
-                "vrsta": "follow",
-                "feature": "facebookusersub"
+                "vrsta": "postb",
+                "feature": "facebookcom"
             }
             
             response = make_request(
@@ -174,8 +174,8 @@ class FacebookFollowFeature:
             self.credits_service.record_failure()
             raise FeatureError(f"Task validation failed: {str(e)}")
 
-    def execute_follow_cycle(self, cookies: str) -> bool:
-        """Execute a complete Facebook follow cycle.
+    def execute_comment_cycle(self, cookies: str) -> bool:
+        """Execute a complete Facebook comment cycle.
         
         Args:
             cookies: Like4Like cookie string
@@ -188,7 +188,7 @@ class FacebookFollowFeature:
         """
         try:
             # Get task
-            task = self.get_follow_task(cookies)
+            task = self.get_comment_task(cookies)
             if not task:
                 return False
                 
@@ -200,4 +200,4 @@ class FacebookFollowFeature:
             return self.validate_task(cookies, task)
             
         except Exception as e:
-            raise FeatureError(f"Follow cycle failed: {str(e)}")
+            raise FeatureError(f"Comment cycle failed: {str(e)}")

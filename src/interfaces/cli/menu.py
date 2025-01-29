@@ -2,17 +2,48 @@
 
 import sys
 import time
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Dict, Any
 
 from ...core.exceptions import AuthenticationError, FeatureError
-from ...auth.facebook import FacebookAuth
 from ...auth.like4like import Like4LikeAuth
 from ...services.credits import CreditsService
 from ...services.browser import BrowserService
-from ...features.facebook.follow import FacebookFollowFeature
-from ...features.twitter.like import TwitterLikeFeature
 from ...i18n.manager import i18n
 from .display import DisplayManager
+
+# Import Twitter features
+from ...features.twitter.follow import TwitterFollowFeature
+from ...features.twitter.like import TwitterLikeFeature
+from ...features.twitter.retweet import TwitterRetweetFeature
+
+# Import Facebook features
+from ...features.facebook.follow import FacebookFollowFeature
+from ...features.facebook.subscribe import FacebookSubscribeFeature
+from ...features.facebook.like import FacebookLikeFeature
+from ...features.facebook.share import FacebookShareFeature
+from ...features.facebook.comment import FacebookCommentFeature
+
+# Import Instagram features
+from ...features.instagram.follow import InstagramFollowFeature
+from ...features.instagram.like import InstagramLikeFeature
+from ...features.instagram.comment import InstagramCommentFeature
+
+# Import TikTok features
+from ...features.tiktok.follow import TikTokFollowFeature
+from ...features.tiktok.like import TikTokLikeFeature
+
+# Import Pinterest features
+from ...features.pinterest.follow import PinterestFollowFeature
+from ...features.pinterest.repin import PinterestRepinFeature
+
+# Import SoundCloud features
+from ...features.soundcloud.follow import SoundCloudFollowFeature
+from ...features.soundcloud.like import SoundCloudLikeFeature
+
+# Import other platform features
+from ...features.myspace.connect import MySpaceConnectFeature
+from ...features.reverbnation.fan import ReverbNationFanFeature
+from ...features.okru.join import OkruJoinFeature
 
 class MenuManager:
     """Manage CLI menu system and user interactions."""
@@ -20,23 +51,93 @@ class MenuManager:
     def __init__(self):
         """Initialize menu manager with required services."""
         self.display = DisplayManager()
-        self.facebook_auth = FacebookAuth()
         self.like4like_auth = Like4LikeAuth()
         self.credits_service = CreditsService()
         self.browser_service = BrowserService()
         
-        # Feature modules
-        self.facebook_feature = FacebookFollowFeature()
-        self.twitter_feature = TwitterLikeFeature()
+        # Initialize all feature objects
+        # Twitter features
+        self.twitter_follow = TwitterFollowFeature()
+        self.twitter_like = TwitterLikeFeature()
+        self.twitter_retweet = TwitterRetweetFeature()
         
-        # Share credits service with features
-        self.facebook_feature.credits_service = self.credits_service
-        self.twitter_feature.credits_service = self.credits_service
+        # Facebook features
+        self.facebook_follow = FacebookFollowFeature()
+        self.facebook_subscribe = FacebookSubscribeFeature()
+        self.facebook_like = FacebookLikeFeature()
+        self.facebook_share = FacebookShareFeature()
+        self.facebook_comment = FacebookCommentFeature()
+
+        # Instagram features
+        self.instagram_follow = InstagramFollowFeature()
+        self.instagram_like = InstagramLikeFeature()
+        self.instagram_comment = InstagramCommentFeature()
+
+        # TikTok features
+        self.tiktok_follow = TikTokFollowFeature()
+        self.tiktok_like = TikTokLikeFeature()
+
+        # Pinterest features
+        self.pinterest_follow = PinterestFollowFeature()
+        self.pinterest_repin = PinterestRepinFeature()
+
+        # SoundCloud features
+        self.soundcloud_like = SoundCloudLikeFeature()
+        self.soundcloud_follow = SoundCloudFollowFeature()
+
+        # Other platforms
+        self.myspace_connect = MySpaceConnectFeature()
+        self.reverbnation_fan = ReverbNationFanFeature()
+        self.okru_join = OkruJoinFeature()
+
+        # Share credits service with all features
+        feature_objects = [
+            self.twitter_follow, self.twitter_like, self.twitter_retweet,
+            self.facebook_follow, self.facebook_subscribe, self.facebook_like,
+            self.facebook_share, self.facebook_comment,
+            self.instagram_follow, self.instagram_like, self.instagram_comment,
+            self.tiktok_follow, self.tiktok_like,
+            self.pinterest_follow, self.pinterest_repin,
+            self.soundcloud_like, self.soundcloud_follow,
+            self.myspace_connect, self.reverbnation_fan, self.okru_join
+        ]
+        
+        for feature in feature_objects:
+            feature.credits_service = self.credits_service
+        
+        # Map menu choices to features
+        self.feature_map = {
+            # Twitter Features
+            "3": (self.twitter_follow, 'execute_follow_cycle'),
+            "4": (self.twitter_like, 'execute_like_cycle'),
+            "5": (self.twitter_retweet, 'execute_retweet_cycle'),
+            # Facebook Features
+            "6": (self.facebook_follow, 'execute_follow_cycle'),
+            "7": (self.facebook_subscribe, 'execute_subscribe_cycle'),
+            "8": (self.facebook_like, 'execute_like_cycle'),
+            "9": (self.facebook_share, 'execute_share_cycle'),
+            "10": (self.facebook_comment, 'execute_comment_cycle'),
+            # Instagram Features
+            "11": (self.instagram_follow, 'execute_follow_cycle'),
+            "12": (self.instagram_like, 'execute_like_cycle'),
+            "13": (self.instagram_comment, 'execute_comment_cycle'),
+            # TikTok Features
+            "14": (self.tiktok_follow, 'execute_follow_cycle'),
+            "15": (self.tiktok_like, 'execute_like_cycle'),
+            # Pinterest Features
+            "16": (self.pinterest_follow, 'execute_follow_cycle'),
+            "17": (self.pinterest_repin, 'execute_repin_cycle'),
+            # SoundCloud Features
+            "18": (self.soundcloud_like, 'execute_like_cycle'),
+            "19": (self.soundcloud_follow, 'execute_follow_cycle'),
+            # Other Platforms
+            "20": (self.myspace_connect, 'execute_connect_cycle'),
+            "21": (self.reverbnation_fan, 'execute_fan_cycle'),
+            "22": (self.okru_join, 'execute_join_cycle')
+        }
         
         # State
-        self.fb_cookies = None
         self.l4l_cookies = None
-        self.user_info = None
 
     def ensure_like4like_login(self) -> str:
         """Ensure Like4Like login is available.
@@ -63,44 +164,9 @@ class MenuManager:
             
         return self.l4l_cookies
 
-    def ensure_facebook_login(self) -> str:
-        """Ensure Facebook login is available.
-        
-        Returns:
-            str: Facebook cookie string
-            
-        Raises:
-            AuthenticationError: If login fails
-        """
-        if not self.fb_cookies:
-            self.display.show_notice(i18n.get_text('login.browser_login.steps.facebook'))
-            
-            with self.browser_service as browser:
-                self.fb_cookies = self.facebook_auth.get_cookies_from_browser(browser.driver)
-                
-            if not self.fb_cookies:
-                raise AuthenticationError("Facebook login failed")
-                
-            # Validate and get user info
-            name, user_id = self.facebook_auth.validate_user(self.fb_cookies)
-            self.user_info = {"name": name, "id": user_id}
-            
-            # Update stored cookies
-            cookies = self.like4like_auth.load_cookies()
-            cookies["Facebook"] = self.fb_cookies
-            self.like4like_auth.save_cookies(cookies)
-            
-            # Show connection status
-            self.display.show_status(self.credits_service.total_credits, name, user_id)
-            time.sleep(2.5)
-            
-        return self.fb_cookies
-
     def handle_profile_exchange(self) -> None:
         """Handle profile exchange feature."""
-        self.ensure_facebook_login()
-        
-        fblink = self.display.prompt("")
+        profile_link = self.display.prompt("")
         self.display.show_notice(i18n.get_text('actions.enter_credits'))
         
         try:
@@ -109,7 +175,7 @@ class MenuManager:
             
             if self.credits_service.exchange_for_followers(
                 self.l4l_cookies,
-                fblink,
+                profile_link,
                 credits
             ):
                 self.display.show_success(i18n.get_text('status.exchange_success'))
@@ -121,78 +187,82 @@ class MenuManager:
         except Exception as e:
             self.display.show_error(str(e))
 
-    def handle_follow_mission(self) -> None:
-        """Handle follow mission feature."""
-        self.ensure_facebook_login()
+    def handle_feature_mission(self, feature_obj, cycle_method: str) -> None:
+        """Generic handler for any feature mission.
         
+        Args:
+            feature_obj: Feature instance to execute
+            cycle_method: Name of the cycle method to call
+        """
         self.display.show_notice(i18n.get_text('actions.enter_delay'))
         try:
             delay = int(self.display.prompt(""))
             self.display.show_notice(i18n.get_text('actions.running_mission'))
-            
-            while True:
-                try:
-                    success = self.facebook_feature.execute_follow_cycle(
-                        self.l4l_cookies,
-                        self.fb_cookies
-                    )
-                    
-                    # Update credits display
-                    credits = self.credits_service.get_balance(self.l4l_cookies)
-                    self.display.show_status(credits)
-                    
-                    # Show progress stats
-                    stats = self.credits_service.get_statistics()
-                    self.display.show_progress(
-                        i18n.get_text('status.mission_progress'),
-                        int(stats['success_count']),
-                        int(stats['failed_count'])
-                    )
-                    
-                    time.sleep(delay)
-                    
-                except KeyboardInterrupt:
-                    break
-                except Exception as e:
-                    self.display.show_error(str(e))
-                    break
-                    
+            self._execute_mission_cycle(feature_obj, cycle_method, delay)
         except ValueError:
             self.display.show_error(i18n.get_text('errors.invalid_delay'))
 
-    def handle_twitter_likes(self) -> None:
-        """Handle Twitter likes feature."""
-        self.display.show_notice(i18n.get_text('actions.enter_delay'))
-        try:
-            delay = int(self.display.prompt(""))
-            self.display.show_notice(i18n.get_text('actions.running_mission'))
-            
-            while True:
-                try:
-                    success = self.twitter_feature.execute_like_cycle(self.l4l_cookies)
+    def _execute_mission_cycle(self, feature_obj, cycle_method: str, delay: int) -> None:
+        """Execute a mission cycle with retry logic and bot detection.
+        
+        Args:
+            feature_obj: Feature instance to execute
+            cycle_method: Name of the cycle method to call
+            delay: Initial delay between tasks in seconds
+        """
+        consecutive_failures = 0
+        current_delay = delay
+        
+        while True:
+            try:
+                # Get previous credits to compare
+                previous_credits = self.credits_service.get_balance(self.l4l_cookies)
+                
+                # Execute the cycle method
+                getattr(feature_obj, cycle_method)(self.l4l_cookies)
+                
+                # Wait for action to register with current delay
+                time.sleep(current_delay)
+                
+                # Get new credits balance
+                new_credits = self.credits_service.get_balance(self.l4l_cookies)
+                
+                # Check if credits changed
+                if new_credits <= previous_credits:
+                    consecutive_failures += 1
+                    current_delay += 5  # Increase delay by 5 seconds on failure
+                    self.display.show_notice(f"Task failed. Increasing delay to {current_delay} seconds.")
                     
-                    # Update credits display
-                    credits = self.credits_service.get_balance(self.l4l_cookies)
-                    self.display.show_status(credits)
-                    
-                    # Show progress stats
-                    stats = self.credits_service.get_statistics()
-                    self.display.show_progress(
-                        i18n.get_text('status.mission_progress'),
-                        int(stats['success_count']),
-                        int(stats['failed_count'])
-                    )
-                    
-                    time.sleep(delay)
-                    
-                except KeyboardInterrupt:
+                    if consecutive_failures >= 3:
+                        self.display.show_error("Bot detection triggered. Stopping mission.")
+                        break
+                else:
+                    consecutive_failures = 0  # Reset failure count on success
+                    current_delay = delay  # Reset delay to original value
+                
+                # Update credits display
+                self.display.show_status(new_credits)
+                
+                # Show progress stats
+                stats = self.credits_service.get_statistics()
+                self.display.show_progress(
+                    i18n.get_text('status.mission_progress'),
+                    int(stats['success_count']),
+                    int(stats['failed_count'])
+                )
+                
+            except KeyboardInterrupt:
+                break
+            except Exception as e:
+                consecutive_failures += 1
+                current_delay += 5
+                self.display.show_error(f"{str(e)}. Increasing delay to {current_delay} seconds.")
+                
+                if consecutive_failures >= 3:
+                    self.display.show_error("Too many errors. Stopping mission.")
                     break
-                except Exception as e:
-                    self.display.show_error(str(e))
-                    break
                     
-        except ValueError:
-            self.display.show_error(i18n.get_text('errors.invalid_delay'))
+                time.sleep(current_delay)
 
     def handle_delete_links(self) -> None:
         """Handle link deletion feature."""
@@ -216,6 +286,60 @@ class MenuManager:
             i18n.current_lang = "en"
             i18n.save_language_preference()
 
+    def handle_all_features(self) -> None:
+        """Run all features in sequence with bot detection handling."""
+        self.display.show_notice(i18n.get_text('actions.enter_delay'))
+        try:
+            delay = int(self.display.prompt(""))
+            self.display.show_notice(i18n.get_text('actions.running_mission'))
+            
+            skipped_features = set()  # Track features to skip
+            
+            while True:
+                for choice, (feature_obj, method) in self.feature_map.items():
+                    try:
+                        # Skip if feature is in cooldown
+                        if feature_obj in skipped_features:
+                            continue
+                            
+                        # Run the feature
+                        previous_credits = self.credits_service.get_balance(self.l4l_cookies)
+                        getattr(feature_obj, method)(self.l4l_cookies)
+                        time.sleep(delay)
+                        new_credits = self.credits_service.get_balance(self.l4l_cookies)
+                        
+                        # Check for bot detection
+                        if new_credits <= previous_credits:
+                            self.display.show_notice(f"Bot detection for feature {choice}. Skipping for 10 minutes.")
+                            skipped_features.add(feature_obj)
+                            continue
+                            
+                        # Show progress
+                        self.display.show_status(new_credits)
+                        stats = self.credits_service.get_statistics()
+                        self.display.show_progress(
+                            i18n.get_text('status.mission_progress'),
+                            int(stats['success_count']),
+                            int(stats['failed_count'])
+                        )
+                        
+                    except KeyboardInterrupt:
+                        return
+                    except Exception as e:
+                        self.display.show_error(f"Error in feature {choice}: {str(e)}")
+                        continue
+                        
+                # Remove features from skip list after 10 minutes
+                current_time = time.time()
+                if len(skipped_features) > 0:
+                    time.sleep(600)  # Wait 10 minutes
+                    skipped_features.clear()
+                    
+        except ValueError:
+            self.display.show_error(i18n.get_text('errors.invalid_delay'))
+        except KeyboardInterrupt:
+            return
+
     def run(self) -> None:
         """Run the main menu loop."""
         try:
@@ -226,7 +350,6 @@ class MenuManager:
             # Load and validate Like4Like session
             cookies = self.like4like_auth.load_cookies()
             self.l4l_cookies = cookies.get("Like4Like")
-            self.fb_cookies = cookies.get("Facebook")
             
             # Ensure we have valid Like4Like session
             self.l4l_cookies = self.ensure_like4like_login()
@@ -239,20 +362,27 @@ class MenuManager:
                 self.display.show_menu()
                 choice = self.display.prompt("")
                 
-                if choice == "1":
+                # Run All Features
+                if choice == "0":
+                    self.handle_all_features()
+                # Profile Management
+                elif choice == "1":
                     self.handle_profile_exchange()
                 elif choice == "2":
-                    self.handle_follow_mission()
-                elif choice == "3":
+                    self.handle_profile_exchange()  # Same as 1 but different type
+                
+                # Feature missions
+                elif choice in self.feature_map:
+                    feature_obj, method = self.feature_map[choice]
+                    self.handle_feature_mission(feature_obj, method)
+                
+                # Management
+                elif choice == "23":
                     self.handle_delete_links()
-                elif choice == "4":
-                    self.handle_profile_exchange()  # Same as 1 but different feature type
-                elif choice == "5":
-                    self.handle_twitter_likes()
-                elif choice == "6":
-                    sys.exit(0)
-                elif choice == "7":
+                elif choice == "24":
                     self.select_language()
+                elif choice == "25":
+                    sys.exit(0)
                 else:
                     self.display.show_error(i18n.get_text('errors.invalid_choice'))
                     

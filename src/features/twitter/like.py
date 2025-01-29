@@ -5,7 +5,7 @@ import time
 import datetime
 from typing import Optional, Dict
 
-from ...core.constants import LIKE4LIKE_BASE_URL, SUCCESS_CODES
+from ...core.constants import LIKE4LIKE_BASE_URL, SUCCESS_CODES, FEATURE_TYPES
 from ...core.exceptions import FeatureError
 from ...services.credits import CreditsService
 from ...utils.http import create_session, make_request
@@ -31,16 +31,20 @@ class TwitterLikeFeature:
             FeatureError: If task fetch fails
         """
         try:
+           
             # Set up initial headers
-            self.session.headers.update({
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+            headers = {
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
                 "Sec-Fetch-Mode": "navigate",
                 "Upgrade-Insecure-Requests": "1",
                 "Host": "www.like4like.org",
                 "Sec-Fetch-Dest": "document",
+                "User-Agent": "Mozilla/5.0 (Linux; Android 13; Pixel 6 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36",
+                "Accept-Language": "id",
                 "Sec-Fetch-Site": "same-origin",
                 "Sec-Fetch-User": "?1"
-            })
+            }
+            self.session.headers.update(headers)
 
             # Get initial page
             response = make_request(
@@ -51,25 +55,29 @@ class TwitterLikeFeature:
             )
 
             # Update headers for task request
-            self.session.headers.update({
+            task_headers = {
                 "Referer": f"{LIKE4LIKE_BASE_URL}/user/earn-twitter-favorites.php",
                 "X-Requested-With": "XMLHttpRequest",
                 "Accept": "application/json, text/javascript, */*; q=0.01",
                 "Sec-Fetch-Dest": "empty",
                 "Sec-Fetch-Mode": "cors"
-            })
+            }
+            self.session.headers.update(task_headers)
 
             # Get task
             response = make_request(
                 method="GET",
-                url=f"{LIKE4LIKE_BASE_URL}/api/get-tasks.php?feature=twitterfav",
+                url=f"{LIKE4LIKE_BASE_URL}/api/get-tasks.php?feature={FEATURE_TYPES['TWITTER_FAV']}",
                 session=self.session,
                 cookies={"Cookie": cookies}
             )
 
             if SUCCESS_CODES['LIKE4LIKE_SUCCESS'] in response.text and "twitter.com" in response.text:
                 tasks = json.loads(response.text)["data"]["tasks"]
-                return tasks[0] if tasks else None
+                if tasks:
+                    return tasks[0]
+                else:
+                    return None
             elif "tasks" not in response.text:
                 raise FeatureError("Bot detection triggered")
             else:
@@ -107,7 +115,7 @@ class TwitterLikeFeature:
                     "idzad": task["idlink"],
                     "vrsta": "favorites",
                     "idcod": task["taskId"],
-                    "feature": "twitterfav",
+                    "feature": FEATURE_TYPES['TWITTER_FAV'],
                     "_": timestamp
                 }
             )
@@ -150,7 +158,7 @@ class TwitterLikeFeature:
                 "idclana": task["code3"],
                 "cnt": "true",
                 "vrsta": "favorites",
-                "feature": "twitterfav"
+                "feature": FEATURE_TYPES['TWITTER_FAV']
             }
             
             response = make_request(
@@ -164,7 +172,14 @@ class TwitterLikeFeature:
             success = all(code in response.text for code in SUCCESS_CODES.values())
             
             if success:
-                self.credits_service.record_success()
+                try:
+                    new_credits = json.loads(response.text).get("credits")
+                    if new_credits:
+                        self.credits_service.total_credits = new_credits
+                    self.credits_service.record_success()
+                except json.JSONDecodeError:
+                    # If we can't parse credits, still count as success but don't update credits
+                    self.credits_service.record_success()
             else:
                 self.credits_service.record_failure()
                 
