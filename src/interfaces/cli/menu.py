@@ -294,13 +294,11 @@ class MenuManager:
         self.display.show_notice(i18n.get_text('actions.enter_delay'))
         try:
             delay = int(self.display.prompt(""))
-            choice = str(current_feature_index + 3)  # Convert index to feature number
-            feature_name = FEATURE_NAMES.get(choice, f"Feature {choice}")
-            self.display.show_notice(f"Running {feature_name} mission, use CTRL + C if stuck and CTRL + Z to stop!")
+            self.display.show_notice("Running all features mission, use CTRL + C if stuck and CTRL + Z to stop!")
             
-            skipped_features = set()  # Track features to skip
             current_feature_index = 0
             feature_items = list(self.feature_map.items())
+            skipped_features = set()  # Track features to skip
             
             while True:
                 if current_feature_index >= len(feature_items):
@@ -318,6 +316,10 @@ class MenuManager:
                 if feature_obj in skipped_features:
                     current_feature_index += 1
                     continue
+                    
+                # Show which feature we're starting
+                feature_name = FEATURE_NAMES.get(choice, f"Feature {choice}")
+                self.display.show_notice(f"Starting {feature_name} mission...")
                 
                 # Run the feature repeatedly until bot detection
                 consecutive_failures = 0
